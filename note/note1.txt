@@ -1,0 +1,133 @@
+上次介绍的遗传方法 变异率较大，这一点比较奇怪， 于是我检查了代码， 以及做了一些测试，发现变异几乎没有起到改善解的作用，但自交却起着关键的作用，这次我将自交作为一个neighbor function作为结果进行展示
+
+通过以往的结果：
+集合图
+exploitation（挖掘）: exploration(探索)
+adj2 属于 insertion 属于 arb2 属于 inversion
+adj2 属于 insertion 属于 shear
+
+这里我使用了刘健的其他策略的结果进行对比
+这里我只展示一下自己设计的neighborhood structure
+
+TSP
+random init
+greedy init 
+
+FS
+random init
+greedy init
+两个参数
+
+
+特性分析
+neighborhood is large, O(n^3)
+inversion, O(n^2)
+adj2, O(n) 过于短视
+arb2, O(n^2)
+
+
+比较 first move:best move
+比较init solution
+比较收敛时间与收敛程度
+
+
+
+[[44 21 54 62 52],
+ [40 12 22 75 74],
+ [74 59 89 75 95],
+ [59 38 17 24 52],
+ [73 93 78 60 84],
+ [97 75 13 27 32],
+ [92 62 28 19 48],
+ [23 34 91 54 45],
+ [33 74 38 82 66],
+ [66 47 74 11 91],
+ [92 63 61 13 81],
+ [12 96 10 59 14],
+ [67 98 20 54 71],
+ [62 16 20 88 20],
+ [15 33 43 51 63],
+ [14 96 99 31 91],
+ [77 46 98 25 34],
+ [88 83 32 43 94],
+ [70 11 86 38 82],
+ [73 86 34 68 80]]
+
+
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+#这里导入你自己的数据
+#......
+#......
+#x_axix，train_pn_dis这些都是长度相同的list()
+
+#开始画图
+sub_axix = filter(lambda x:x%200 == 0, x_axix)
+plt.title('Result Analysis')
+plt.plot(x_axix, train_acys, color='green', label='training accuracy')
+plt.plot(sub_axix, test_acys, color='red', label='testing accuracy')
+plt.plot(x_axix, train_pn_dis,  color='skyblue', label='PN distance')
+plt.plot(x_axix, thresholds, color='blue', label='threshold')
+plt.legend() # 显示图例
+
+plt.xlabel('iteration times')
+plt.ylabel('rate')
+plt.show()
+
+
+大家的selection 不一样，crossover不一样， 交流方式不一样 
+
+a = {i:j for i, j in zip(label_set, range(len(label_set)))}
+
+三类
+将数据分给每个核    预处理解决
+将目标分给每个核    selection是解决
+结构化的协作           migration
+
+先写一个
+Queue[0] 放种群
+Queue[1] 放子代
+
+先做一个不预处理的， 可复用的， NSGA-II的， master-slave的并行
+
+
+72 12.618756527900695 1.3552520723626165
+36 12.405479383468627 1.2675237797274448
+18 10.809925186634064 1.367771585388939
+9 10.839178736209869 1.0376315801450522
+4 16.116372885704042 0.9141368747937797
+2 33.87415491104126 0.9100205874679113
+72 20.549157242774964 1.3441720150484897
+36 11.644958827495575 1.3920717239379883
+18 10.143489823341369 1.3220502716479916
+9 10.787610688209533 0.8471258040701989
+4 13.387302379608155 0.8778742799664488
+2 20.53859743595123 0.8924178793878839
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
