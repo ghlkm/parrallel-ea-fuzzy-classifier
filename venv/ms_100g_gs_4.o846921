@@ -1,0 +1,2 @@
+{'migration': 'master-slave', 'objective': 'nsga-ii', 'data_division': 'NO', 'file-name': 'Breast_w.csv', 'evaluation_num': 10000000000.0, 'core_num': 4, 'init': None, 'init_N_pop': 200, 'stop_generation': 100, 'N_pop': 200, 'weight-vector': (-1, 1), 'P_M': 0.1, 'P_m': 0.1, 'lnum': 2, 'P_dc': 0.8, 'N_rule': 14, 'delimiter': ',', 'mode': '5CV', 'migration_fre': 5, 'migration_num': 3}
+0.2441115379333496
