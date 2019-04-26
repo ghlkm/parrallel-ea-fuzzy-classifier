@@ -71,13 +71,14 @@ class RuleSet:
     def __getitem__(self, item):
         return self.rules[item]
     def __iter__(self):
-        self.num=-1
-        return self
+        return self.rules.__iter__()
+        # return self.iter
     def __next__(self):
-        self.num+=1
-        if self.num>=len(self.rules):
-            raise StopIteration
-        return self.rules[self.num]
+        return self.rules.__next__()
+        # self.num+=1
+        # if self.num>=len(self.rules):
+        #     raise StopIteration
+        # return self.rules[self.num]
     def append(self, item):
         self.rules.append(item)
     def extend(self, items):
@@ -935,7 +936,7 @@ if __name__ == '__main__':
             'migration': RING,# 协作方式
             'objective': NSGA_II,
             'data_division': NODIVISION,
-            'file-name':'Breast_w.csv',
+            'file-name':'Breast_W.csv',
             'evaluation_num': 1e10,
             'core_num': 2,
             'init':None,
