@@ -364,11 +364,7 @@ def compatibility_grade(rule:Rule, xp_i, loc_mbs:np.ndarray):
     result = 1
     # print(type(rule), type(loc_mbs), type(loc_mbs))
     for i in range(len(rule)):
-        # print(xp_i, i, rule[i])
-        result *= loc_mbs[xp_i, i, rule[i]]
-        # except:
-        #     print(xp_i, i, rule[i], rule)
-        #     exit()
+        result += np.log(loc_mbs[xp_i, i, rule[i]])
     return result
 def win_rule(rules:RuleSet, xp_i, reject, error, loc_label):
     """
@@ -561,10 +557,13 @@ def ring_ga(args, data, labels):
     for p in process_pool:
         p.terminate()
     selection=gen_selection_fun(args)
-    results=selection(results)[:args['N_pop']]
+    tmp=[]
+    for r in results:
+        if not inPop(r, tmp):
+            tmp.append(r)
+    results=selection(tmp)[:min(args['N_pop'], len(tmp))]
     return results
-    # print('???')
-    # return results
+
 
 
 def ring_migraion(pop, args, g, queue_in:Queue, queue_out:Queue):
