@@ -569,12 +569,13 @@ def ring_ga(args, data, labels):
     for p in process_pool:
         p.terminate()
     selection=gen_selection_fun(args)
-    tmp =[]
+    tmp=[]
     for r in results:
-         if not inPop(r, tmp):
-             tmp.append(tmp)
-    results=selection(tmp)[:min([args['N_pop'], len(tmp)])]
+        if not inPop(r, tmp):
+            tmp.append(r)
+    results=selection(tmp)[:min(args['N_pop'], len(tmp))]
     return results
+
 
 
 def ring_migraion(pop, args, g, queue_in:Queue, queue_out:Queue):
