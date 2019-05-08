@@ -29,7 +29,6 @@ class Rule:
         self.cq=0
         self.cfq=0
         self.correct=0
-
     def __len__(self):
         return len(self.rule)
     def __getitem__(self, item):
@@ -57,28 +56,21 @@ class RuleSet:
         self.dominated_num=0
         self.dominate_list=[]
     def __lt__(self, other):
-        return self.fitness<other.fitness
-    def __gt__(self, other):
         return self.fitness>other.fitness
+    def __gt__(self, other):
+        return self.fitness<other.fitness
     def __eq__(self, other):
         return self.fitness==other.fitness
     def __ge__(self, other):
-        return self.fitness>=other.fitness
-    def __le__(self, other):
         return self.fitness<=other.fitness
+    def __le__(self, other):
+        return self.fitness>=other.fitness
     def __len__(self):
         return len(self.rules)
     def __getitem__(self, item):
         return self.rules[item]
     def __iter__(self):
         return self.rules.__iter__()
-        # return self.iter
-    def __next__(self):
-        return self.rules.__next__()
-        # self.num+=1
-        # if self.num>=len(self.rules):
-        #     raise StopIteration
-        # return self.rules[self.num]
     def append(self, item):
         self.rules.append(item)
     def extend(self, items):
@@ -100,16 +92,26 @@ def getWorker(args):
         return ring_ga
     else:
         return None
-def _preprecess_data(loc_args):
+def _preprecess_data(loc_args, label_dict=None):
     """ read data """
-    data = np.genfromtxt(loc_args['file-name'], delimiter=loc_args['delimiter'])[:, :-1]
-    labels = np.genfromtxt(loc_args['file-name'], delimiter=loc_args['delimiter'], usecols=[-1], dtype=str)
-
+    tr_data = np.genfromtxt(loc_args['train-data'], delimiter=loc_args['delimiter'])[:, :-1]
+    tr_labels = np.genfromtxt(loc_args['train-data'], delimiter=loc_args['delimiter'], usecols=[-1], dtype=str)
     """ discard None data """
-    naise = ~np.isnan(data).any(axis=1)
-    labels = labels[naise]
-    data = data[naise]
-
+    naise = ~np.isnan(tr_data).any(axis=1)
+    tr_labels = tr_labels[naise]
+    tr_data = tr_data[naise]
+    tr_size=tr_data.shape[0]
+    if loc_args['test-data']:
+        ts_data = np.genfromtxt(loc_args['test-data'], delimiter=loc_args['delimiter'])[:, :-1]
+        ts_labels = np.genfromtxt(loc_args['test-data'], delimiter=loc_args['delimiter'], usecols=[-1], dtype=str)
+        naise = ~np.isnan(ts_data).any(axis=1)
+        ts_labels = ts_labels[naise]
+        ts_data = ts_data[naise]
+        data=np.vstack((tr_data, ts_data))
+        labels=np.hstack((tr_labels, ts_labels))
+    else:
+        data=tr_data
+        labels=tr_labels
     """ normalize """
     ming = np.amin(data, axis=0)
     maxg = np.amax(data, axis=0)
@@ -117,15 +119,25 @@ def _preprecess_data(loc_args):
     for i in range(len(data)):
         data[i] = (data[i] - ming) / rangeg
 
+    tr_data=data[:tr_size]
+    ts_data=data[tr_size:]
+    tr_labels=labels[:tr_size]
+    ts_labels=labels[tr_size:]
+    if loc_args['test-data'] is None:
+        tr_data, ts_data, tr_labels, ts_labels = _train_mode(run_which['mode'], tr_data, tr_labels)
+
+
     """ radomize data"""
-    randomize = random.sample(range(data.shape[0]), data.shape[0])
-    data = data[randomize]
-    labels = labels[randomize]
+    randomize = random.sample(range(tr_data.shape[0]), tr_data.shape[0])
+    tr_data = tr_data[randomize]
+    tr_labels = tr_labels[randomize]
 
     """ map label, convenient for computation """
-    label_dict, labels=_label_map(labels)
-    labels=np.ndarray.astype(labels, dtype=int)
-    return data, labels, label_dict
+    label_dict, tr_labels=_label_map(tr_labels, label_dict)
+    label_dict, ts_labels=_label_map(ts_labels, label_dict)
+    ts_labels=np.ndarray.astype(ts_labels, dtype=int)
+    tr_labels=np.ndarray.astype(tr_labels, dtype=int)
+    return tr_data, ts_data, tr_labels, ts_labels, label_dict
 def _gen_fuzzy_set():
     fuzzy_set = dict()  # format: (set order, set number)
     fuzzy_set[0] = (0, 0)
@@ -275,7 +287,7 @@ def gen_selection_fun(loc_args):
                 for i in dominate_list[value[1]]:
                     dominated_num[i] -= 1
                     if dominated_num[i] <= 0:
-                        pop[i].fitness=layer_num
+                        pop[i].fitness=-layer_num
                         Fi.append((pop[i], i))
             layer_num+=1
             cnt += len(Fi)
@@ -362,13 +374,8 @@ def compatibility_grade(rule:Rule, xp_i, loc_mbs:np.ndarray):
     :return:
     """
     result = 1
-    # print(type(rule), type(loc_mbs), type(loc_mbs))
-    for i in range(len(rule)):
-        # print(xp_i, i, rule[i])
-        result *= loc_mbs[xp_i, i, rule[i]]
-        # except:
-        #     print(xp_i, i, rule[i], rule)
-        #     exit()
+    for i,j in enumerate(rule):
+        result *= loc_mbs[xp_i, i, j]
     return result
 def win_rule(rules:RuleSet, xp_i, reject, error, loc_label):
     """
@@ -468,9 +475,10 @@ def simf_gbml(rule_set:RuleSet, mr_x_i, loc_Pmbs:np.ndarray, loc_label, loc_data
     rule_set.extend(uniform_rule_crossover(rule_set, n_ga))
     rule_set_c, _, _ = evaluate(rule_set, loc_label, loc_mbs, loc_data_info)
     return rule_set_c
-def _label_map(labels):
-    label_set = set(labels)
-    label_dict = {i:j for i, j in zip(label_set, range(len(label_set)))}
+def _label_map(labels, label_dict=None):
+    if not label_dict:
+        label_set = set(labels)
+        label_dict = {i:j for i, j in zip(label_set, range(len(label_set)))}
     for i in range(len(labels)):
         labels[i]=label_dict[labels[i]]
     return label_dict, labels
@@ -561,18 +569,23 @@ def ring_ga(args, data, labels):
     for p in process_pool:
         p.terminate()
     selection=gen_selection_fun(args)
-    results=selection(results)[:args['N_pop']]
+    tmp =[]
+    for r in results:
+         if not inPop(r, tmp):
+             tmp.append(tmp)
+    results=selection(tmp)[:min([args['N_pop'], len(tmp)])]
     return results
-    # print('???')
-    # return results
 
 
 def ring_migraion(pop, args, g, queue_in:Queue, queue_out:Queue):
-    # pass
     if  g%args['migration_fre'] == 0:
+        tmpb = time.time()
         a=np.random.randint(0, len(pop)-args['migration_num'], size=args['migration_num'])
         for aa in a:
-            indiv=pop.pop(aa)
+            if not args['copy_migration']:
+                indiv=pop.pop(aa)
+            else:
+                indiv=pop[aa]
             if not queue_out.full():
                 queue_out.put(indiv)
         for i in range(len(a)):
@@ -580,6 +593,7 @@ def ring_migraion(pop, args, g, queue_in:Queue, queue_out:Queue):
                 get=queue_in.get()
                 if not inPop(get, pop):
                     pop.append(get)
+        print('migration ', time.time()-tmpb)
 
 
 def ring_created(args, data, labels, queue_in:Queue, queue_out:Queue, mbs, Pmbs):
@@ -622,28 +636,16 @@ def ring_created(args, data, labels, queue_in:Queue, queue_out:Queue, mbs, Pmbs)
             offsprings.append(offspring)
         pop.extend(offsprings)
         pop=selection(pop)[:args['N_pop']+args['migration_num']]
-        try:
-            ring_migraion(pop, args, g, queue_in, queue_out)
-        except:
-            pass
+        ring_migraion(pop, args, g, queue_in, queue_out)
         pop=pop[:args['N_pop']]
         print('in main', time.time()-b)
         g+=1
-    try:
-        queue_out.put('begin')
-        for i in pop:
-            while queue_out.full():
-                time.sleep(1e-3)
-            queue_out.put(i)
-        queue_out.put('end')
-    except:
-        pass
-    # print('??')
-    # a = np.asarray(pop)
-    # np.savetxt("foo.csv", a, delimiter=",")
-    # print('??')
-
-
+    queue_out.put('begin')
+    for i in pop:
+        while queue_out.full():
+            time.sleep(1e-3)
+        queue_out.put(i)
+    queue_out.put('end')
 
 
 def master_slave_master(args, data, labels):
@@ -655,6 +657,7 @@ def master_slave_master(args, data, labels):
     """
 
     """ init parameter """
+    b=time.time()
     N_pop=args['N_pop']
     queue_in=Queue()
     queue_out=Queue()
@@ -667,12 +670,13 @@ def master_slave_master(args, data, labels):
     selection=gen_selection_fun(args)
     g_fuzzy_set = _gen_fuzzy_set()
     mbs, Pmbs = generate_probability(data, g_fuzzy_set, P_dc)
-
+    print('gen mbs finish', time.time()-b)
     """ init population """
     pop=init_population(args['init_N_pop'], labels, mbs, args['N_rule'], Pmbs, args)
+    print('init pop finish', time.time()-b)
     # 初始化了种群后计算适应度
     selection(pop)
-
+    print('selection finish')
     """ """
     process_pool=[]
     for _ in range(args['core_num'] - 1):
@@ -681,6 +685,7 @@ def master_slave_master(args, data, labels):
         process_pool.append(p)
         p.start()
     """ begin evolution"""
+    print('begin to evolve')
     for g in range(args['stop_generation']):
         b=time.time()
         offsprings=[]
@@ -705,13 +710,21 @@ def master_slave_master(args, data, labels):
     for p in process_pool:
         p.terminate()
     return pop
+
 def master_slave_slave(queue_out:Queue, queue_in:Queue, args:dict,labels, mbs:np.ndarray, Pmbs:np.ndarray):
     crossover=gen_crossover_fun(args)
     mutation=gen_mutation_fun(args)
     P_m=args['P_m']
+    cnt=0
+    offspring=None
     while True:
+        if not offspring:
+            cnt+=1
+        tmp=time.time()
         if not queue_in.empty():
             get=queue_in.get()
+            if cnt%20==0:
+                print("migration", time.time()-tmp)
             if not get:
                 break
         else:
@@ -731,6 +744,8 @@ def master_slave_slave(queue_out:Queue, queue_in:Queue, args:dict,labels, mbs:np
                 queue_out.put(None)
                 continue
         queue_out.put(offspring)
+    print(cnt)
+
 def to_cf_q(rule:Rule, loc_data_info, label, loc_mbs:np.ndarray):
     """
 
@@ -933,29 +948,31 @@ if __name__ == '__main__':
     begin_time=time.time()
     TODO = None
     run_which={
-            'migration': RING,# 协作方式
+            'migration': MASTER_SLAVE,# 协作方式
             'objective': NSGA_II,
             'data_division': NODIVISION,
-            'file-name':'Breast_W.csv',
+            'train-data':'Glass.csv',
+            'test-data':None,
             'evaluation_num': 1e10,
-            'core_num': 2,
+            'core_num': 6,
             'init':None,
-            'init_N_pop':200,
+            'init_N_pop':10,
             # 'crossover':TODO,
             # 'mutation':TODO,
             # 'selection':TODO,
-            'stop_generation': 10,
-            'N_pop':200,
+            'stop_generation': 0,
+            'N_pop':10,
             'weight-vector':(-1, 1),
             'P_M':0.1,
             'P_m':0.1,
             'lnum':0,
             'P_dc':0.8,
-            'N_rule':14,
+            'N_rule':10,
             'delimiter':',',
             'mode':'5CV',
             'migration_fre':5,
-            'migration_num':3
+            'migration_num':3,
+            'copy_migration':True,
     }
     # run_which['crossover']=gen_crossover_fun(run_which)
     # run_which['mutation']=gen_mutation_fun(run_which)
@@ -978,9 +995,9 @@ if __name__ == '__main__':
     #         'wine.csv'
     #     ]
     """ read data """
-    global_data, global_labels, global_label_dict = _preprecess_data(run_which)
-    train_data, tst_data, label, tst_label = _train_mode(run_which['mode'], global_data, global_labels)
-    # p_data, p_labels, global_data, global_labels = _gen_next_process_data(run_which, global_data, global_labels)
+    train_data, tst_data, label, tst_label, label_dict = _preprecess_data(run_which)
+    print('read data finish')
+    print(label_dict)
     worker = getWorker(run_which)
     pop = worker(run_which, train_data, label)
     """ begin testing """

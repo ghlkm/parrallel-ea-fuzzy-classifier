@@ -3,3 +3,8 @@ dataset:
     dimension:4, 20, 100, 500, 2500
     size: 200, 1000, 5000, 30000
     bias
+
+we check that when the data dimension is too high, the computation spee is very slow
+
+
+when dimension is too large almost all membership goto 0
