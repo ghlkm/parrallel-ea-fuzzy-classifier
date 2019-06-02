@@ -1,0 +1,32 @@
+1. 找不同的数据
+	维度， 数据量， bias, unbias
+2. 测试演化速度
+	应该大的数据用拆分或者master slave来做
+	小的数据可以用多种群
+	大的数据集可能要用到代理模型
+
+2. 不同的核数
+	2, 4, 9, 18, 36, 72
+3. migration 不同的设置 fre, num
+	有个样例一定要对比
+		多种群不交流， 多种群交流， 单种群同样evaluation
+4. 具体研究一下cost of communication是多少
+
+5. 当演化不动的时候做migration， 什么时候是演化不动？？
+
+6. 实验更多的算法
+	weight vector
+	MOEAD
+
+7. 大数据的data migration
+
+8. 多层级的migration
+	多种演化方法协作
+
+将所有算法的结果画在一个坐标系上
+用PCA分析相关度
+
+我需要什么输出
+
+这周要做什么
+

@@ -1,0 +1,59 @@
+﻿更大的数据集
+
+也许更多的核数需要更大的种群
+
+小的种群能演化更快
+
+它应该有一个明确的migration rate
+随机送还是择优送，复制送还是迁移
+
+对，你可以比较不同的参数的结果
+
+ (1) What is the level of communication necessary to make a parallel GA behave like a panmictic GA? 
+(2) What is the cost of this communication? And, 
+(3) is the communication cost small enough to make this a viable alternative for the design of parallel GAs? 
+
+
+ In the ﬁrst, the interval between migrations was set to 5 generations, and the number of processors varied.
+ varied the mutation and crossover rates in each deme, attempting to ﬁnd parameter values to balance exploration and exploitation
+
+ there was relatively little change between migrations, but new solutions were found shortly after individuals were exchanged. 
+ 
+
+试一试不交流然后最后的种群比较一下
+
+没有交流的GA 在某一时刻与单一的GA with rn pop_size performance 表现一样 但是 the average quality of the ﬁnal population was much lower in the parallel isolated GA.
+
+一样的eval time, 单种群的，多种群交流， 多种群不交流
+
+A very important theoretical question is to determine if (and under what conditions) a parallel GA can ﬁnd a better solution than a serial GA
+
+ migration is enabled until the population was close to converge. 
+
+你如何输出不同代数的结果， 要改一下测试代码的结构  recombination
+
+%%% 当前工作重心放在增加更多不一样的数据集以及migration的方式上， 
+
+
+university of illonois graduate college
+
+
+ when is the right time to migrate
+
+ parallel GAs with dense topologiesﬁnd the globalsolution using fewer functionevaluationsthan GAs with sparsely connected ones???
+
+
+自然的就一定是好的吗？
+
+种群大小
+
+这是一个新的算法， 与并行本身没关系:
+ If the subpopulation does not progress for a number of generations, one individual will try local hillclimbing.  
+
+贝叶斯滤波 高斯滤波 
+
+
+
+
+
+
