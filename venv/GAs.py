@@ -994,7 +994,8 @@ if __name__ == '__main__':
     }
 
     import sys, getopt
-    opts, args = getopt.getopt(sys.argv[1:], "f:n:")
+    run_times=1
+    opts, args = getopt.getopt(sys.argv[1:], "f:n:c:t:m:r:s:d:")
     for op, val in opts:
         for op, val in opts:
             if op == '-f':
@@ -1039,15 +1040,17 @@ if __name__ == '__main__':
     print('read data finish')
     print(label_dict)
     worker = getWorker(run_which)
-    pop = worker(run_which, train_data, label)
-    """ begin testing """
-    g_fuzzy_set=_gen_fuzzy_set()
-    tst_mbs = to_membership(tst_data, g_fuzzy_set)
-    for i in pop:
-        train_correct=i.objective['correct'][0]
-        tst_evaluate(i, tst_mbs, tst_data, tst_label)
-        print(i.objective['rule_len'][0],',',
-              1-train_correct/len(label),',',
-              1-i.objective['correct'][0]/len(tst_label)
-              )
-    print('finish training at:', time.time()-begin_time)
+    for t in range(run_times):
+        print(t, 'times')
+        pop = worker(run_which, train_data, label)
+        """ begin testing """
+        g_fuzzy_set = _gen_fuzzy_set()
+        tst_mbs = to_membership(tst_data, g_fuzzy_set)
+        for i in pop:
+            train_correct = i.objective['correct'][0]
+            tst_evaluate(i, tst_mbs, tst_data, tst_label)
+            print(i.objective['rule_len'][0], ',',
+                  1 - train_correct / len(label), ',',
+                  1 - i.objective['correct'][0] / len(tst_label)
+                  )
+        print('finish training at:', time.time() - begin_time)

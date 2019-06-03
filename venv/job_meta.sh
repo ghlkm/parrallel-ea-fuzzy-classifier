@@ -1,8 +1,6 @@
 #! /bin/bash
-# fre=(1 5 10 20)
-# num=(1 5 10 20)
-fre=(1)
-num=(1)
+fre=(1 5 10 20)
+num=(1 5 10 20)
 core_num=6
 train_data='Breast_w.csv'
 test_data=''
@@ -26,5 +24,6 @@ for f in ${fre[@]};do
 
     echo 'python' EXEC -f $f -n $n -c $core_num -t $run_times -m $copy -r $train_data -s $test_data -d $delimiter >> mypbs.pbs
     echo >> mypbs.pbs
+    qsub mypbs.pbs
 	done
 done	
