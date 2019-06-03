@@ -1,15 +1,16 @@
-class Mylist(list):
-    def __str__(self):
-        d=','
-        return d.join(self)
 
-def test1(s):
-    print(Mylist(s))
 
-def test2(s):
-    d=','
-    print(d.join(s))
+import sys, getopt
+def read_arg():
+    """
+    f: migration fre
+    n: migration num
+    :return:
+    """
+    opts, args = getopt.getopt(sys.argv[1:], "f:n:")
+    for op, val in opts:
+        print(val)
 
-gs=['a', 'b', 'c']
-test1(gs)
-test2(gs)
+
+if __name__ == '__main__':
+    read_arg()

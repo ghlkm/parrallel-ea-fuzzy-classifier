@@ -17,6 +17,7 @@ RING='ring'
 DYNAMIC='dynamic'
 
 NSGA_II='nsga-ii'
+
 NODIVISION='NO'
 
 class Rule:
@@ -45,6 +46,7 @@ class Rule:
         return self.correct>=other.correct
     def __le__(self, other):
         return self.correct<=other.correct
+
 class RuleSet:
     def __init__(self, rules=None):
         if rules:
@@ -75,6 +77,7 @@ class RuleSet:
         self.rules.append(item)
     def extend(self, items):
         self.rules.extend(items)
+
 def isSame(r1:RuleSet, r2:RuleSet):
     return r1.objective['rule_len'][0]==r2.objective['rule_len'][0] and \
            r1.objective['correct'][0] == r2.objective['correct'][0]
@@ -83,6 +86,7 @@ def inPop(r1:RuleSet, pop):
         if isSame(r1, r2):
             return True
     return False
+
 def _gen_next_process_data(args, data, label):
     return data, label, data, label
 def getWorker(args):
@@ -92,6 +96,7 @@ def getWorker(args):
         return ring_ga
     else:
         return None
+
 def _preprecess_data(loc_args, label_dict=None):
     """ read data """
     tr_data = np.genfromtxt(loc_args['train-data'], delimiter=loc_args['delimiter'])[:, :-1]
@@ -138,6 +143,7 @@ def _preprecess_data(loc_args, label_dict=None):
     ts_labels=np.ndarray.astype(ts_labels, dtype=int)
     tr_labels=np.ndarray.astype(tr_labels, dtype=int)
     return tr_data, ts_data, tr_labels, ts_labels, label_dict
+
 def _gen_fuzzy_set():
     fuzzy_set = dict()  # format: (set order, set number)
     fuzzy_set[0] = (0, 0)
@@ -156,6 +162,7 @@ def _gen_fuzzy_set():
     fuzzy_set[13] = (4, 5)
     fuzzy_set[14] = (5, 5)
     return fuzzy_set
+
 def to_membership(loc_data, fuzzy_sets):
     """
 
@@ -212,6 +219,7 @@ def generate_probability(loc_data, fuzzy_sets, loc_P_dc):
                 # P_c = 1- P_dc, 这个代表了care的概率， 也就是除了don't care这个模糊集其他模糊集概率的总和
                 loc_pmbs[i, j, k] = loc_pmbs[i, j, k - 1] + loc_mbs[i, j, k] / tmp * loc_P_c
     return loc_mbs, loc_pmbs
+
 def gen_selection_fun(loc_args):
     w=loc_args['weight-vector']
     N_pop=loc_args['N_pop']
@@ -320,9 +328,11 @@ def gen_mutation_fun(loc_args):
                     rule[i] = random.randint(0, 14)
         return individual
     return _mutation
+
 def random_two(pop):
     a, b = random.sample(range(len(pop)), 2)
     return (pop[a], pop[b])
+
 def binary_tournament(pop):
     size = len(pop)
     a, b = np.random.randint(size), np.random.randint(size)
@@ -336,8 +346,10 @@ def binary_tournament(pop):
     else:
         parent2 = pop[b]
     return (parent1, parent2)
+
 def parent_select(loc_args):
     return binary_tournament
+
 def gen_crossover_fun(loc_args):
     """
     given pop, return offspring
@@ -362,6 +374,7 @@ def gen_crossover_fun(loc_args):
             offspring.append(copy.deepcopy(parents[i[0]][i[1]]))
         return offspring
     return _crossover
+
 def compatibility_grade(rule:Rule, xp_i, loc_mbs:np.ndarray):
     """
         # 这个值其实是固定的，但我们不预先计算是因为时间复杂度太大太大，这也是为什么我们采用遗传来演化
@@ -377,6 +390,7 @@ def compatibility_grade(rule:Rule, xp_i, loc_mbs:np.ndarray):
     for i,j in enumerate(rule):
         result *= loc_mbs[xp_i, i, j]
     return result
+
 def win_rule(rules:RuleSet, xp_i, reject, error, loc_label):
     """
     两个目标
@@ -945,39 +959,64 @@ def _train_mode(mode, _data, _label):
     else:
         tmp = _data.shape[0] // 2
     return _data[:tmp], _data[tmp:], _label[:tmp], _label[tmp:]
+
+
+
 if __name__ == '__main__':
     begin_time=time.time()
     TODO = None
     run_which={
-            'migration': MASTER_SLAVE,# 协作方式
+            'migration': RING,# 协作方式
             'objective': NSGA_II,
             'data_division': NODIVISION,
-            'train-data':'Glass.csv',
+            'train-data':'sat.trn',
             'test-data':None,
             'evaluation_num': 1e10,
             'core_num': 6,
             'init':None,
-            'init_N_pop':10,
+            'init_N_pop':100,
             # 'crossover':TODO,
             # 'mutation':TODO,
             # 'selection':TODO,
             'stop_generation': 0,
-            'N_pop':10,
+            'N_pop':100,
             'weight-vector':(-1, 1),
             'P_M':0.1,
             'P_m':0.1,
             'lnum':0,
             'P_dc':0.8,
             'N_rule':10,
-            'delimiter':',',
+            'delimiter':' ',
             'mode':'5CV',
             'migration_fre':5,
             'migration_num':3,
             'copy_migration':True,
     }
-    # run_which['crossover']=gen_crossover_fun(run_which)
-    # run_which['mutation']=gen_mutation_fun(run_which)
-    # run_which['selection']=gen_selection_fun(run_which)
+
+    import sys, getopt
+    opts, args = getopt.getopt(sys.argv[1:], "f:n:")
+    for op, val in opts:
+        for op, val in opts:
+            if op == '-f':
+                run_which['migration_fre']=int(val)
+            elif op == '-n':
+                run_which['migration_num']=int(val)
+            elif op == '-c':
+                run_which['core_num'] = int(val)
+            elif op == '-t':
+                run_times=int(val)
+            elif op == '-m':
+                if val=='True':
+                    run_which['copy_migration']=True
+                else:
+                    run_which['copy_migration']=False
+            elif op=='-r':
+                run_which['train-data']=val
+            elif op=='-s':
+                run_which['test-data']=val
+            elif op == '-d':
+                run_which['delimiter'] = val
+
 
     # parallelism=\
     #     [
