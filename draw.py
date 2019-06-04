@@ -1,9 +1,7 @@
 import matplotlib.pyplot as plt
-from  mpl_toolkits.mplot3d import  Axes3D
+from mpl_toolkits.mplot3d import  Axes3D
 import numpy as np
 import os
-import json
-from shutil import copyfile
 
 fs=os.listdir()
 # for i in fs:
@@ -25,6 +23,8 @@ fs=os.listdir()
 #                     name += '_' + ls[45].replace(',', '').replace('}', '').replace('\n', '')
 #                 break
 #     copyfile(i, name+'.out')
+
+
 
 for i in fs:
     lnum=1

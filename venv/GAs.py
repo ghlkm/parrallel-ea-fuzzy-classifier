@@ -128,7 +128,7 @@ def _preprecess_data(loc_args, label_dict=None):
     ts_data=data[tr_size:]
     tr_labels=labels[:tr_size]
     ts_labels=labels[tr_size:]
-    if loc_args['test-data'] is None:
+    if not loc_args['test-data']:
         tr_data, ts_data, tr_labels, ts_labels = _train_mode(run_which['mode'], tr_data, tr_labels)
 
 
@@ -995,7 +995,7 @@ if __name__ == '__main__':
 
     import sys, getopt
     run_times=1
-    opts, args = getopt.getopt(sys.argv[1:], "f:n:c:t:m:r:s:d:")
+    opts, args = getopt.getopt(sys.argv[1:], "f:n:c:t:m:r:sd:")
     for op, val in opts:
         for op, val in opts:
             if op == '-f':
