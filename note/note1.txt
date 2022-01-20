@@ -1,13 +1,13 @@
-ÉÏ´Î½éÉÜµÄÒÅ´«·½·¨ ±äÒìÂÊ½Ï´ó£¬ÕâÒ»µã±È½ÏÆæ¹Ö£¬ ÓÚÊÇÎÒ¼ì²éÁË´úÂë£¬ ÒÔ¼°×öÁËÒ»Ğ©²âÊÔ£¬·¢ÏÖ±äÒì¼¸ºõÃ»ÓĞÆğµ½¸ÄÉÆ½âµÄ×÷ÓÃ£¬µ«×Ô½»È´Æğ×Å¹Ø¼üµÄ×÷ÓÃ£¬Õâ´ÎÎÒ½«×Ô½»×÷ÎªÒ»¸öneighbor function×÷Îª½á¹û½øĞĞÕ¹Ê¾
+ä¸Šæ¬¡ä»‹ç»çš„é—ä¼ æ–¹æ³• å˜å¼‚ç‡è¾ƒå¤§ï¼Œè¿™ä¸€ç‚¹æ¯”è¾ƒå¥‡æ€ªï¼Œ äºæ˜¯æˆ‘æ£€æŸ¥äº†ä»£ç ï¼Œ ä»¥åŠåšäº†ä¸€äº›æµ‹è¯•ï¼Œå‘ç°å˜å¼‚å‡ ä¹æ²¡æœ‰èµ·åˆ°æ”¹å–„è§£çš„ä½œç”¨ï¼Œä½†è‡ªäº¤å´èµ·ç€å…³é”®çš„ä½œç”¨ï¼Œè¿™æ¬¡æˆ‘å°†è‡ªäº¤ä½œä¸ºä¸€ä¸ªneighbor functionä½œä¸ºç»“æœè¿›è¡Œå±•ç¤º
+ 
+é€šè¿‡ä»¥å¾€çš„ç»“æœï¼š
+é›†åˆå›¾
+exploitationï¼ˆæŒ–æ˜ï¼‰: exploration(æ¢ç´¢)
+adj2 å±äº insertion å±äº arb2 å±äº inversion
+adj2 å±äº insertion å±äº shear
 
-Í¨¹ıÒÔÍùµÄ½á¹û£º
-¼¯ºÏÍ¼
-exploitation£¨ÍÚ¾ò£©: exploration(Ì½Ë÷)
-adj2 ÊôÓÚ insertion ÊôÓÚ arb2 ÊôÓÚ inversion
-adj2 ÊôÓÚ insertion ÊôÓÚ shear
-
-ÕâÀïÎÒÊ¹ÓÃÁËÁõ½¡µÄÆäËû²ßÂÔµÄ½á¹û½øĞĞ¶Ô±È
-ÕâÀïÎÒÖ»Õ¹Ê¾Ò»ÏÂ×Ô¼ºÉè¼ÆµÄneighborhood structure
+è¿™é‡Œæˆ‘ä½¿ç”¨äº†åˆ˜å¥çš„å…¶ä»–ç­–ç•¥çš„ç»“æœè¿›è¡Œå¯¹æ¯”
+è¿™é‡Œæˆ‘åªå±•ç¤ºä¸€ä¸‹è‡ªå·±è®¾è®¡çš„neighborhood structure
 
 TSP
 random init
@@ -16,19 +16,19 @@ greedy init
 FS
 random init
 greedy init
-Á½¸ö²ÎÊı
+ä¸¤ä¸ªå‚æ•°
 
 
-ÌØĞÔ·ÖÎö
+ç‰¹æ€§åˆ†æ
 neighborhood is large, O(n^3)
 inversion, O(n^2)
-adj2, O(n) ¹ıÓÚ¶ÌÊÓ
+adj2, O(n) è¿‡äºçŸ­è§†
 arb2, O(n^2)
 
 
-±È½Ï first move:best move
-±È½Ïinit solution
-±È½ÏÊÕÁ²Ê±¼äÓëÊÕÁ²³Ì¶È
+æ¯”è¾ƒ first move:best move
+æ¯”è¾ƒinit solution
+æ¯”è¾ƒæ”¶æ•›æ—¶é—´ä¸æ”¶æ•›ç¨‹åº¦
 
 
 
@@ -58,39 +58,39 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-#ÕâÀïµ¼ÈëÄã×Ô¼ºµÄÊı¾İ
+#è¿™é‡Œå¯¼å…¥ä½ è‡ªå·±çš„æ•°æ®
 #......
 #......
-#x_axix£¬train_pn_disÕâĞ©¶¼ÊÇ³¤¶ÈÏàÍ¬µÄlist()
+#x_axixï¼Œtrain_pn_disè¿™äº›éƒ½æ˜¯é•¿åº¦ç›¸åŒçš„list()
 
-#¿ªÊ¼»­Í¼
+#å¼€å§‹ç”»å›¾
 sub_axix = filter(lambda x:x%200 == 0, x_axix)
 plt.title('Result Analysis')
 plt.plot(x_axix, train_acys, color='green', label='training accuracy')
 plt.plot(sub_axix, test_acys, color='red', label='testing accuracy')
 plt.plot(x_axix, train_pn_dis,  color='skyblue', label='PN distance')
 plt.plot(x_axix, thresholds, color='blue', label='threshold')
-plt.legend() # ÏÔÊ¾Í¼Àı
+plt.legend() # æ˜¾ç¤ºå›¾ä¾‹
 
 plt.xlabel('iteration times')
 plt.ylabel('rate')
 plt.show()
 
 
-´ó¼ÒµÄselection ²»Ò»Ñù£¬crossover²»Ò»Ñù£¬ ½»Á÷·½Ê½²»Ò»Ñù 
+å¤§å®¶çš„selection ä¸ä¸€æ ·ï¼Œcrossoverä¸ä¸€æ ·ï¼Œ äº¤æµæ–¹å¼ä¸ä¸€æ · 
 
 a = {i:j for i, j in zip(label_set, range(len(label_set)))}
 
-ÈıÀà
-½«Êı¾İ·Ö¸øÃ¿¸öºË    Ô¤´¦Àí½â¾ö
-½«Ä¿±ê·Ö¸øÃ¿¸öºË    selectionÊÇ½â¾ö
-½á¹¹»¯µÄĞ­×÷           migration
+ä¸‰ç±»
+å°†æ•°æ®åˆ†ç»™æ¯ä¸ªæ ¸    é¢„å¤„ç†è§£å†³
+å°†ç›®æ ‡åˆ†ç»™æ¯ä¸ªæ ¸    selectionæ˜¯è§£å†³
+ç»“æ„åŒ–çš„åä½œ           migration
 
-ÏÈĞ´Ò»¸ö
-Queue[0] ·ÅÖÖÈº
-Queue[1] ·Å×Ó´ú
+å…ˆå†™ä¸€ä¸ª
+Queue[0] æ”¾ç§ç¾¤
+Queue[1] æ”¾å­ä»£
 
-ÏÈ×öÒ»¸ö²»Ô¤´¦ÀíµÄ£¬ ¿É¸´ÓÃµÄ£¬ NSGA-IIµÄ£¬ master-slaveµÄ²¢ĞĞ
+å…ˆåšä¸€ä¸ªä¸é¢„å¤„ç†çš„ï¼Œ å¯å¤ç”¨çš„ï¼Œ NSGA-IIçš„ï¼Œ master-slaveçš„å¹¶è¡Œ
 
 
 72 12.618756527900695 1.3552520723626165
