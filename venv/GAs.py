@@ -9,7 +9,7 @@ from multiprocessing import Process
 from multiprocessing import Queue
 from multiprocessing import Manager
 """
-@author ghlkm
+@author ghlkm  
 """
 
 MASTER_SLAVE='master-slave'
