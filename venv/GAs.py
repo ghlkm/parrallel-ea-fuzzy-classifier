@@ -13,7 +13,7 @@ from multiprocessing import Manager
 """
 
 MASTER_SLAVE='master-slave'
-RING='ring'
+RING='ring' #
 DYNAMIC='dynamic'
 
 NSGA_II='nsga-ii'
